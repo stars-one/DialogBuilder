@@ -1,19 +1,16 @@
-package wan.Utils;
+package wan.dormsystem.utils;
 
 import com.jfoenix.controls.JFXAlert;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.sun.istack.internal.Nullable;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Optional;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,11 +29,12 @@ public class DialogBuilder {
     private JFXButton negativeBtn = null;
     private JFXButton positiveBtn = null;
     private Window window;
-    private JFXDialogLayout jfxDialogLayout = new JFXDialogLayout();
     private Paint negativeBtnPaint = Paint.valueOf("#747474");//否定按钮文字颜色，默认灰色
     private Paint positiveBtnPaint = Paint.valueOf("#0099ff");
     private Hyperlink hyperlink = null;
+    private TextField textField = null;
     private JFXAlert<String> alert;
+    private OnInputListener onInputListener = null;
 
     /**
      * 构造方法
@@ -55,6 +53,10 @@ public class DialogBuilder {
     public DialogBuilder setMessage(String message) {
         this.message = message;
         return this;
+    }
+
+    public DialogBuilder setPositiveBtn(String positiveBtnText) {
+        return setPositiveBtn(positiveBtnText, null, null);
     }
 
     public DialogBuilder setNegativeBtn(String negativeBtnText) {
@@ -130,7 +132,9 @@ public class DialogBuilder {
      * @return
      */
     public DialogBuilder setPositiveBtn(String positiveBtnText, @Nullable OnClickListener positiveBtnOnclickListener, String color) {
-        this.positiveBtnPaint = Paint.valueOf(color);
+        if (color != null) {
+            this.positiveBtnPaint = Paint.valueOf(color);
+        }
         return setPositiveBtn(positiveBtnText, positiveBtnOnclickListener);
     }
 
@@ -145,7 +149,6 @@ public class DialogBuilder {
         positiveBtn = new JFXButton(positiveBtnText);
         positiveBtn.setDefaultButton(true);
         positiveBtn.setTextFill(positiveBtnPaint);
-        System.out.println("执行setPostiveBtn");
         positiveBtn.setOnAction(closeEvent -> {
             alert.hideWithAnimation();
             if (positiveBtnOnclickListener != null) {
@@ -155,24 +158,25 @@ public class DialogBuilder {
         return this;
     }
 
+    /**
+     * 设置超链接（文件输出路径，网址跳转），会自动打开指定浏览器或者是资源管理器执行操作
+     *
+     * @param text 文件的路径，或者是网址，
+     * @return
+     */
     public DialogBuilder setHyperLink(String text) {
         hyperlink = new Hyperlink(text);
         hyperlink.setBorder(Border.EMPTY);
         hyperlink.setOnMouseClicked(event -> {
-            if (text.contains("www") || text.contains("com") || text.contains(".")) {
-                try {
-                    Desktop.getDesktop().browse(new URI(text));
-                } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            } else if (text.contains(File.separator)) {
-                try {
-                    Desktop.getDesktop().open(new File(text));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            MyUtils.setLinkAutoAction(hyperlink);
         });
+        return this;
+    }
+
+    public DialogBuilder setTextFieldText(OnInputListener onInputListener) {
+
+        this.textField = new TextField();
+        this.onInputListener = onInputListener;
         return this;
     }
 
@@ -188,12 +192,19 @@ public class DialogBuilder {
 
         JFXDialogLayout layout = new JFXDialogLayout();
         layout.setHeading(new Label(title));
-        //添加hyperlink超链接文本
+        //添加hyperlink超链接文本或者是输入框
         if (hyperlink != null) {
-            layout.setBody(new HBox(new Label(this.message),hyperlink));
+            layout.setBody(new HBox(new Label(this.message), hyperlink));
+        } else if (textField != null) {
+            layout.setBody(new VBox(new Label(this.message), textField));
+            positiveBtn.setOnAction(event -> {
+                alert.setResult(textField.getText());
+                alert.hideWithAnimation();
+            });
         } else {
             layout.setBody(new VBox(new Label(this.message)));
         }
+
         //添加确定和取消按钮
         if (negativeBtn != null && positiveBtn != null) {
             layout.setActions(negativeBtn, positiveBtn);
@@ -206,13 +217,22 @@ public class DialogBuilder {
         }
 
         alert.setContent(layout);
-        alert.showAndWait();
+        Optional<String> input = alert.showAndWait();
+        //不为空，则回调接口
+        if (input.isPresent()) {
+            onInputListener.onGetText(input.get());
+        }
 
         return alert;
     }
 
+
     public interface OnClickListener {
         void onClick();
+    }
+
+    public interface OnInputListener {
+        void onGetText(String result);
     }
 
 }

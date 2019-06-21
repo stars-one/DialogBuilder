@@ -10,6 +10,7 @@
 //tfOutPath是一个控件（controller）
 new DialogBuilder(tfOutPath).setTitle("提示").setMessage("登录成功").setNegativeBtn("确定").create();
 ```
+
 - 确定和取消按钮，有个`OnClickListener`监听器负责执行点击按钮后执行的操作	
 ![](https://img2018.cnblogs.com/blog/1210268/201906/1210268-20190607215052202-1431984727.png)
 ```
@@ -25,13 +26,14 @@ new DialogBuilder(tfOutPath).setNegativeBtn("取消", new DialogBuilder.OnClickL
             }
         }).setTitle("提示").setMessage("hello world").create();
 ```
+
 - 更改文字颜色	
 ![](https://img2018.cnblogs.com/blog/1210268/201906/1210268-20190607215229338-1498299135.png)
 ```
 new DialogBuilder(startBtn).setTitle("提示").setMessage("hello world").setPositiveBtn("确定", "#ff3333").setNegativeBtn("取消", "#00ff00").create();
 ```
 
-- 输出路径对话框
+- 输出路径对话框	
 点击打开资源管理器，并定位当该目录	
 ![](https://img2018.cnblogs.com/blog/1210268/201906/1210268-20190609124354180-2119437060.png)
 ```
@@ -40,7 +42,8 @@ new DialogBuilder(tfOutPath).setTitle("提示")
 	.setHyperLink("Q:\\MyBlog")
 	.setNegativeBtn("确定").create();
 ```
-- 网页链接对话框
+
+- 网页链接对话框	
 点击打开默认浏览器，跳转到该网址	
 ![](https://img2018.cnblogs.com/blog/1210268/201906/1210268-20190609124813542-312991733.png)
 ```
@@ -48,6 +51,19 @@ new DialogBuilder(tfOutPath).setTitle("提示")
 	.setMessage("已完成，输出目录为")
 	.setHyperLink("www.cnblogs.com/kexing")
 	.setNegativeBtn("确定").create();
+```
+
+- 提供一个输入框	
+![](https://img2018.cnblogs.com/blog/1210268/201906/1210268-20190621110811412-719584258.png)
+
+```
+new DialogBuilder(btnLogin).setTitle("提示").setMessage("输入").setTextFieldText(new DialogBuilder.OnInputListener() {
+            @Override
+            public void onGetText(String result) {
+                //返回一个输入结果result
+                //相关的逻辑操作
+            }
+        }).setPositiveBtn("确定").setNegativeBtn("取消").create();
 ```
 
 **后期有空再更新，更新常用的对话框布局**
