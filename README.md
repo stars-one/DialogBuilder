@@ -1,5 +1,14 @@
+
+**此库已合并到[common-controls](https://github.com/stars-one/common-controls),此库不再更新，仅做留档**
+
+**This library has been move to [common-controls](https://github.com/stars-one/common-controls) This reposity would be not updated,only just for archiving purposes.**
+
+---
 # DialogBuilder
 A way for JavaFx and based on Jfoenix to generate a diglog
+
+
+
 ## Introduction
 [中文文档](https://github.com/Stars-One/DialogBuilder/blob/master/readme_cn.md)         
 I copy the code with TurekBot and make it become a jar which can easily to generate the dialog. @TurekBot 
